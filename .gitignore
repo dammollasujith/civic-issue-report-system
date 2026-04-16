@@ -1,0 +1,21 @@
+node_modules/
+.next/
+dist/
+build/
+.turbo/
+.vercel/
+.env
+.env.local
+.env.*.local
+coverage/
+logs/
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Uploads (if local fallback enabled)
+server/uploads/

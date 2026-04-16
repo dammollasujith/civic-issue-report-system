@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  height: 100%;
+}
+
+:root {
+  color-scheme: light;
+  --bg: 255 255 255;
+  --fg: 15 23 42;
+  --muted: 71 85 105;
+  --card: 255 255 255;
+  --border: 226 232 240;
+  --ring: 37 99 235;
+
+  --g1: 37 99 235;
+  --g2: 20 184 166;
+  --g3: 124 58 237;
+}
+
+html.dark {
+  color-scheme: dark;
+  --bg: 2 6 23;
+  --fg: 226 232 240;
+  --muted: 148 163 184;
+  --card: 15 23 42;
+  --border: 51 65 85;
+  --ring: 20 184 166;
+
+  --g1: 37 99 235;
+  --g2: 20 184 166;
+  --g3: 249 115 22;
+}
+
+body {
+  color: rgb(var(--fg));
+  background:
+    radial-gradient(1200px circle at 10% 10%, rgba(var(--g1), 0.18), transparent 55%),
+    radial-gradient(1000px circle at 90% 20%, rgba(var(--g2), 0.14), transparent 55%),
+    radial-gradient(900px circle at 70% 95%, rgba(var(--g3), 0.12), transparent 55%),
+    radial-gradient(700px circle at 20% 70%, rgba(253, 186, 116, 0.22), transparent 60%),
+    radial-gradient(600px circle at 85% 80%, rgba(251, 191, 36, 0.14), transparent 60%),
+    rgb(var(--bg));
+}
+
+.font-sans {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans",
+    "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+.glass {
+  background: rgba(var(--card), 0.72);
+  border: 1px solid rgba(var(--border), 0.65);
+  backdrop-filter: blur(14px);
+}
+
+/* Keep app overlays above Leaflet tiles */
+.leaflet-container {
+  z-index: 0;
+}
+

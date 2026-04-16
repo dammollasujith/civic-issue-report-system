@@ -1,0 +1,18 @@
+import type { NextFunction, Request, Response } from "express";
+import { HttpError } from "../utils/httpError.js";
+
+export function errorHandler(err: unknown, _req: Request, res: Response, _next: NextFunction) {
+  if (err instanceof HttpError) {
+    return res.status(err.status).json({
+      ok: false,
+      message: err.message,
+      code: err.code,
+      details: err.details
+    });
+  }
+
+  // eslint-disable-next-line no-console
+  console.error(err);
+  return res.status(500).json({ ok: false, message: "Internal Server Error" });
+}
+

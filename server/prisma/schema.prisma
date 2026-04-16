@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  citizen
+  admin
+}
+
+enum IssueStatus {
+  pending
+  reviewed
+  assigned
+  in_progress
+  resolved
+  rejected
+}
+
+enum IssueSeverity {
+  low
+  medium
+  high
+  critical
+}
+
+enum IssueCategory {
+  roads
+  garbage
+  water_leakage
+  drainage
+  streetlight
+  traffic_signal
+  illegal_parking
+  sanitation
+  public_safety
+  others
+}
+
+enum Department {
+  roads
+  water
+  sanitation
+  electrical
+  traffic
+  other
+}
+
+enum NotificationKind {
+  issue_created
+  status_changed
+  comment
+  nearby_alert
+  system
+}
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name      String
+  email     String   @unique
+  phone     String?
+  passwordHash String?
+  role      UserRole @default(citizen)
+  avatarUrl String?
+  address   String?
+  isBlocked Boolean  @default(false)
+
+  googleId  String?  @unique
+
+  resetPasswordTokenHash String?
+  resetPasswordExpiresAt  DateTime?
+
+  issues          Issue[]         @relation("UserIssues")
+  notifications   Notification[]
+  upvotes         IssueUpvote[]
+
+  @@index([role])
+  @@index([isBlocked])
+  @@index([createdAt])
+}
+
+model Issue {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title       String
+  description String
+  category    IssueCategory
+  severity    IssueSeverity
+  status      IssueStatus @default(pending)
+  isAnonymous Boolean @default(false)
+
+  latitude  Float
+  longitude Float
+  address   String?
+  landmark  String?
+  ward      String?
+
+  // Stored as JSON: [{ url, publicId?, kind: "image"|"video" }]
+  media Json?
+
+  createdById String
+  createdBy   User @relation("UserIssues", fields: [createdById], references: [id], onDelete: Cascade)
+
+  assignedDepartment Department @default(other)
+  assignedStaffName  String?
+  expectedCompletionDate DateTime?
+  adminNotes String?
+  resolvedAt DateTime?
+
+  upvotes IssueUpvote[]
+
+  @@index([status])
+  @@index([category])
+  @@index([severity])
+  @@index([ward])
+  @@index([createdAt])
+  @@index([upvoteCount])
+
+  // denormalized count for fast sorting
+  upvoteCount Int @default(0)
+}
+
+model IssueUpvote {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  issueId String
+  userId  String
+  issue   Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([issueId, userId])
+  @@index([issueId])
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title   String
+  message String
+  kind    NotificationKind @default(system)
+  readAt  DateTime?
+  meta    Json?
+
+  @@index([userId, createdAt])
+  @@index([kind])
+}
+
